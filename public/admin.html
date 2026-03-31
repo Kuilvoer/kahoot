@@ -392,29 +392,31 @@
           }
         });
 
-        // 2. Reveal Bronze #3
+        // 2. Play Outro Music early (at 2s), so the drop perfectly aligns with #1
         setTimeout(() => {
-          const p3 = document.getElementById('podium-3');
-          if(p3) { p3.style.transform = 'translateY(0)'; p3.style.opacity = '1'; }
-        }, 3500);
-
-        // 3. Reveal Silver #2
-        setTimeout(() => {
-          const p2 = document.getElementById('podium-2');
-          if(p2) { p2.style.transform = 'translateY(0)'; p2.style.opacity = '1'; }
-        }, 7000);
-
-        // 4. Reveal Gold #1 with Confetti and Outro Song!
-        setTimeout(() => {
-          const p1 = document.getElementById('podium-1');
-          if(p1) { p1.style.transform = 'translateY(0)'; p1.style.opacity = '1'; }
-
-          // Play Outro Music precisely at #1 Reveal
           const outroAudio = document.getElementById('outro-audio');
           if (outroAudio) {
             outroAudio.currentTime = 0;
             outroAudio.play().catch(e => console.warn("Browser auto-play prevented audio:", e));
           }
+        }, 2000);
+
+        // 3. Reveal Bronze #3
+        setTimeout(() => {
+          const p3 = document.getElementById('podium-3');
+          if(p3) { p3.style.transform = 'translateY(0)'; p3.style.opacity = '1'; }
+        }, 3500);
+
+        // 4. Reveal Silver #2
+        setTimeout(() => {
+          const p2 = document.getElementById('podium-2');
+          if(p2) { p2.style.transform = 'translateY(0)'; p2.style.opacity = '1'; }
+        }, 7000);
+
+        // 5. Reveal Gold #1 with Confetti! (And perfect drop)
+        setTimeout(() => {
+          const p1 = document.getElementById('podium-1');
+          if(p1) { p1.style.transform = 'translateY(0)'; p1.style.opacity = '1'; }
 
           if (typeof confetti === 'function') {
             confetti({
