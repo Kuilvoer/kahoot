@@ -686,6 +686,8 @@ input::placeholder {
 }
 
 .leaderboard-card {
+  position: absolute;
+  top: 0;
   background: var(--bg-secondary);
   border: 1px solid rgba(255,255,255,0.1);
   box-shadow: var(--shadow-md);
@@ -897,4 +899,81 @@ input::placeholder {
   .leaderboard-name {
     font-size: 1rem;
   }
+}
+
+/* ===== ADMIN LARGE SCREEN (1024px+) ===== */
+@media (min-width: 1024px) {
+  .container--admin {
+    padding: 2rem 5vw;
+    max-width: 1800px;
+  }
+
+  /* Dashboard Split Layouts */
+  .admin-split {
+    display: flex;
+    gap: 4rem;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .admin-split > .admin-split-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .admin-split > .admin-split-right {
+    flex: 1.5;
+  }
+
+  /* Make typography explicitly massive for the hall screen */
+  .admin-split-left .section-title {
+    font-size: 2rem;
+    color: var(--text-secondary);
+  }
+  
+  .admin-split-left .question-text {
+    font-size: 3rem;
+    text-align: left;
+    margin: 1rem 0 2rem 0;
+    line-height: 1.2;
+  }
+
+  .admin-split-left .admin-correct-label {
+    font-size: 1.2rem;
+  }
+
+  .admin-split-left .admin-correct-value {
+    font-size: 2.5rem;
+  }
+
+  /* Make Leaderboard Cards Massive */
+  .leaderboard-card {
+    padding: 1.5rem 2rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .leaderboard-card-rank { font-size: 2.5rem; width: 80px; }
+  .leaderboard-card-name { font-size: 2.2rem; }
+  .leaderboard-card-score { font-size: 2.5rem; }
+
+  /* Admin In-Game Options massive display */
+  .admin-option {
+    padding: 1.5rem 2rem;
+  }
+  .admin-option-icon { font-size: 2.5rem; }
+  .admin-option-text { font-size: 1.8rem; }
+  .admin-option-count { font-size: 1.8rem; min-width: 60px; padding: 0.5rem; }
+
+  /* Logo adjustment */
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    margin-bottom: 2rem;
+  }
+  .logo h1 { font-size: 3rem; margin-bottom: 0;}
+  .logo p { font-size: 1.5rem; }
 }

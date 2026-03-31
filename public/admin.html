@@ -73,67 +73,75 @@
 
     <!-- ===== QUESTION VIEW ===== -->
     <div id="view-question" class="hidden">
-      <div class="card">
-        <div class="admin-question-header">
-          <span class="admin-question-counter" id="question-counter">Sale 1 / 20</span>
-          <button id="skip-question-btn" class="btn-primary" style="padding: 5px 15px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; background: var(--accent-error);">
-            ⏭️ Skip Vraag
-          </button>
-        </div>
-
-        <!-- Flash Sale Timer Admin -->
-        <div class="flash-sale-container">
-          <div class="flash-sale-header">
-            <span class="flash-sale-title">⚡ FLASH SALE ENDS IN: <span id="admin-timer">30</span>s</span>
+      <div class="card admin-split">
+        
+        <!-- Left Side: Titles and Timer -->
+        <div class="admin-split-left">
+          <div class="admin-question-header" style="justify-content: flex-start; gap: 2rem;">
+            <span class="admin-question-counter" id="question-counter">Sale 1 / 20</span>
+            <button id="skip-question-btn" class="btn-primary" style="padding: 5px 15px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; background: var(--accent-error);">
+              ⏭️ Skip Vraag
+            </button>
           </div>
-          <div class="flash-sale-track">
-            <div class="flash-sale-bar" id="admin-timer-bar" style="width: 100%;"></div>
-          </div>
-        </div>
 
-        <p class="question-text" id="admin-question-text">Productbeschrijving wordt geladen...</p>
+          <p class="question-text" id="admin-question-text">Productbeschrijving wordt geladen...</p>
 
-        <div class="admin-options" id="admin-options">
-          <!-- Options will be injected here -->
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="admin-stats">
-          <div class="admin-stat">
-            <span class="admin-stat-label">Orders Geplaatst</span>
-            <span class="admin-stat-value" id="admin-answers-count">0 / 0</span>
-          </div>
-          <div class="admin-stat">
-            <span class="admin-stat-label">Klanten in Sessie</span>
-            <span class="admin-stat-value" id="admin-players-ingame">0</span>
+          <div class="flash-sale-container" style="margin-top: auto; width: 100%;">
+            <div class="flash-sale-header">
+              <span class="flash-sale-title">⚡ FLASH SALE ENDS IN: <span id="admin-timer">30</span>s</span>
+            </div>
+            <div class="flash-sale-track">
+              <div class="flash-sale-bar" id="admin-timer-bar" style="width: 100%;"></div>
+            </div>
           </div>
         </div>
+
+        <!-- Right Side: Options and Stats -->
+        <div class="admin-split-right">
+          <div class="admin-options" id="admin-options" style="margin-top: 0;">
+            <!-- Options will be injected here -->
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="admin-stats">
+            <div class="admin-stat">
+              <span class="admin-stat-label">Orders Geplaatst</span>
+              <span class="admin-stat-value" id="admin-answers-count">0 / 0</span>
+            </div>
+            <div class="admin-stat">
+              <span class="admin-stat-label">Klanten in Sessie</span>
+              <span class="admin-stat-value" id="admin-players-ingame">0</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
     <!-- ===== LEADERBOARD VIEW ===== -->
     <div id="view-leaderboard" class="hidden">
-      <div class="card card--wide">
-        <div class="admin-leaderboard-header">
-          <h2 class="section-title" style="text-align:center;">🔥 Top 5 Bestsellers (Revenue)</h2>
-          <div class="admin-correct-answer">
+      <div class="card admin-split">
+        
+        <div class="admin-split-left">
+          <h2 class="section-title">Resultaat & Bestsellers</h2>
+          
+          <div class="admin-correct-answer" style="text-align: left; margin: 3rem 0;">
             <span class="admin-correct-label">Ideale Strategie:</span>
             <span class="admin-correct-value" id="admin-correct-answer">—</span>
           </div>
+
+          <div class="admin-question-info" style="text-align: left; margin-bottom: 2rem; font-size: 1.2rem;">
+            <span id="admin-question-progress">Verkoopdoel 1 / 20 afgerond</span>
+          </div>
+
+          <button class="btn btn-primary" id="next-question-btn" style="padding: 20px; font-size: 1.5rem;">Ga naar de Volgende Sale →</button>
         </div>
 
-        <div class="divider"></div>
-
-        <ul class="leaderboard leaderboard--animated" id="admin-leaderboard"></ul>
-
-        <div class="divider"></div>
-
-        <div class="admin-question-info">
-          <span id="admin-question-progress">Verkoopdoel 1 / 20 afgerond</span>
+        <div class="admin-split-right">
+          <ul class="leaderboard leaderboard--animated" id="admin-leaderboard"></ul>
         </div>
-
-        <button class="btn btn-primary" id="next-question-btn">Ga naar de Volgende Sale →</button>
+        
       </div>
     </div>
 
@@ -220,8 +228,11 @@
     // Animation logic for smoothly sliding players
     function renderSleekLeaderboard(container, top5) {
       const medals = ['🥇', '🥈', '🥉', '', ''];
-      const itemHeight = 75; 
-      const gap = 12;
+      // Determine if large screen vs small screen to adjust heights
+      const isLargeScreen = window.innerWidth >= 1024;
+      const itemHeight = isLargeScreen ? 120 : 75; 
+      const gap = isLargeScreen ? 20 : 12;
+
       container.style.height = `${top5.length * (itemHeight + gap)}px`;
 
       const renderedUsernames = new Set();
