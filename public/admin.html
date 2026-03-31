@@ -404,10 +404,17 @@
           if(p2) { p2.style.transform = 'translateY(0)'; p2.style.opacity = '1'; }
         }, 7000);
 
-        // 4. Reveal Gold #1 with Confetti!
+        // 4. Reveal Gold #1 with Confetti and Outro Song!
         setTimeout(() => {
           const p1 = document.getElementById('podium-1');
           if(p1) { p1.style.transform = 'translateY(0)'; p1.style.opacity = '1'; }
+
+          // Play Outro Music precisely at #1 Reveal
+          const outroAudio = document.getElementById('outro-audio');
+          if (outroAudio) {
+            outroAudio.currentTime = 0;
+            outroAudio.play().catch(e => console.warn("Browser auto-play prevented audio:", e));
+          }
 
           if (typeof confetti === 'function') {
             confetti({
@@ -544,10 +551,6 @@
     socket.on('showLeaderboard', ({ correctAnswer, top5, isLastQuestion, questionIndex, totalQuestions }) => {
 
       if (isLastQuestion) {
-        // Play outro song ONLY at the very end
-        outroAudio.currentTime = 0;
-        outroAudio.play().catch(e => console.warn("Browser auto-play prevented audio:", e));
-
         showView(viewFinal);
 
         const finalLeaderboard = document.getElementById('final-leaderboard-admin');
