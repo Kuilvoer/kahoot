@@ -21,42 +21,53 @@
       <p>Sales Dashboard (Live Data)</p>
 
       <!-- Jukebox Control -->
-      <div class="jukebox-controls">
-        <button id="toggle-music-btn" class="btn btn-primary" style="padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; margin-top: 10px;">
+      <div class="jukebox-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 10px;">
+        <button id="toggle-music-btn" class="btn btn-primary" style="padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; margin:0;">
           🎵 Jukebox: UIT
         </button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Volume</span>
+          <input type="range" id="volume-slider" min="0" max="100" value="30" style="width: 120px; padding: 0;">
+        </div>
       </div>
     </div>
 
     <!-- ===== LOBBY VIEW ===== -->
     <div id="view-lobby">
-      <div class="card">
-        <div class="admin-header">
-          <div class="admin-qr" style="display:flex; flex-direction:column; align-items:flex-start;">
-            <span class="admin-pin-label" style="font-size:0.75rem;">Scan & Shop</span>
-            <img id="qr-code-img" src="" alt="QR Code" width="80" height="80" style="margin-top:5px; border-radius:8px; background:white; padding:4px;">
-          </div>
-          <div class="admin-pin">
-            <span class="admin-pin-label">Game PIN</span>
-            <span class="admin-pin-value" id="admin-pin">1234</span>
-          </div>
-          <div class="admin-players">
-            <span class="admin-players-label">Klanten Online</span>
-            <span class="admin-players-value" id="admin-player-count">0</span>
-          </div>
+      <div class="card card--wide" style="display: flex; flex-wrap: wrap; gap: var(--space-2xl); align-items: stretch; min-height: 60vh;">
+        
+        <!-- Left Side: Giant QR -->
+        <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg); padding: var(--space-xl);">
+          <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">Scan & Shop</h2>
+          <img id="qr-code-img" src="" alt="QR Code" style="width: 100%; max-width: 60vh; height: auto; max-height: 60vh; border-radius: 12px; background: white; padding: 15px;">
+          <p style="margin-top: 15px; color: var(--text-secondary); font-size: 1.1rem; text-align: center;">Of typ de game link in op je browser.</p>
         </div>
 
-        <div class="divider"></div>
+        <!-- Right Side: Game Info -->
+        <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column;">
+          <div class="admin-header" style="flex-direction: column; align-items: flex-start; gap: var(--space-md);">
+            <div class="admin-pin" style="margin-bottom: var(--space-md);">
+              <span class="admin-pin-label">Game PIN</span>
+              <span class="admin-pin-value" id="admin-pin" style="font-size: 4rem;">1234</span>
+            </div>
+            <div class="admin-players">
+              <span class="admin-players-label">Klanten Online</span>
+              <span class="admin-players-value" id="admin-player-count">0</span>
+            </div>
+          </div>
 
-        <div id="admin-lobby">
-          <h2 class="section-title">Bezoekers in de Wachtkamer</h2>
-          <p class="status status-waiting" id="admin-waiting">Wachten op actieve shoppers...</p>
-          <ul class="player-list" id="admin-player-list"></ul>
+          <div class="divider"></div>
+
+          <div id="admin-lobby" style="flex: 1; overflow-y: auto; padding-right: 10px;">
+            <h2 class="section-title">Bezoekers in de Wachtkamer</h2>
+            <p class="status status-waiting" id="admin-waiting">Wachten op actieve shoppers...</p>
+            <ul class="player-list" id="admin-player-list"></ul>
+          </div>
+
+          <button class="btn btn-start" id="start-game-btn" disabled style="margin-top: var(--space-lg);">
+            🛍️ Open de Webshop (Start)
+          </button>
         </div>
-
-        <button class="btn btn-start" id="start-game-btn" disabled>
-          🛍️ Open de Webshop (Start)
-        </button>
       </div>
     </div>
 
@@ -193,6 +204,12 @@
       }
     });
 
+    document.getElementById('volume-slider').addEventListener('input', function(e) {
+      if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
+        ytPlayer.setVolume(e.target.value);
+      }
+    });
+
     const outroAudio = document.getElementById('outro-audio');
 
     // ===== FORMATTING =====
@@ -275,7 +292,8 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const qrImg = document.getElementById('qr-code-img');
-      if (qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin)}`;
+      const size = Math.floor(Math.min(window.innerHeight * 0.75, 400)); // Dynamic size up to 400px
+      if (qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(window.location.origin)}`;
     });
 
     // ===== VIEW SWITCHING =====
