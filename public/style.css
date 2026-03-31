@@ -899,6 +899,12 @@ input::placeholder {
   .leaderboard-name {
     font-size: 1rem;
   }
+
+  /* Keep dashboard pin somewhat reasonable on mobile */
+  .admin-pin-value { font-size: 2.2rem; }
+  .admin-split .section-title { font-size: 1.4rem; }
+  .admin-split .question-text { font-size: 1.5rem; }
+  .admin-split .admin-correct-value { font-size: 1.8rem; }
 }
 
 /* ===== ADMIN LARGE SCREEN (1024px+) ===== */
@@ -940,12 +946,23 @@ input::placeholder {
     line-height: 1.2;
   }
 
+  /* Explicitly large for hall screen */
+  .admin-split-left .admin-pin-value,
+  .admin-split-right .admin-pin-value {
+    font-size: 4rem;
+  }
+
   .admin-split-left .admin-correct-label {
     font-size: 1.2rem;
   }
 
   .admin-split-left .admin-correct-value {
     font-size: 2.5rem;
+  }
+
+  #next-question-btn {
+    padding: 20px;
+    font-size: 1.5rem;
   }
 
   /* Make Leaderboard Cards Massive */

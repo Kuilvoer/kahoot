@@ -228,6 +228,17 @@ io.on('connection', (socket) => {
       return;
     }
 
+    // Profanity Filter
+    const PROHIBITED_WORDS = [
+      'kanker', 'tyfus', 'tering', 'kut', 'hoer', 'slet', 'mongool', 'klootzak', 'bitch', 'fuck', 'shit', 'asshole', 'dick', 'cunt', 'pussy', 'whore', 'slut', 'fag', 'nigger', 'nigga', 'cancer', 'hitler', 'nazi', 'suck'
+    ];
+    const lowerName = username.trim().toLowerCase();
+    const isProfane = PROHIBITED_WORDS.some(word => lowerName.includes(word));
+    if (isProfane) {
+      socket.emit('joinError', { message: 'Deze naam bevat ongepast taalgebruik. Bedenk een leukere naam.' });
+      return;
+    }
+
     // Check for duplicate username (skip if same socket re-joining)
     const nameTaken = Object.entries(players).some(
       ([id, p]) => id !== socket.id && p.username.toLowerCase() === username.trim().toLowerCase()

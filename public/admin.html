@@ -11,7 +11,7 @@
 <body>
 
   <!-- Hidden YT Player -->
-  <div id="yt-player" style="display:none;"></div>
+  <div id="yt-player" style="position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px;"></div>
   
   <audio id="outro-audio" src="audio/outro-song_oqu8zAg.mp3"></audio>
 
@@ -48,7 +48,7 @@
           <div class="admin-header" style="flex-direction: column; align-items: flex-start; gap: var(--space-md);">
             <div class="admin-pin" style="margin-bottom: var(--space-md);">
               <span class="admin-pin-label">Game PIN</span>
-              <span class="admin-pin-value" id="admin-pin" style="font-size: 4rem;">1234</span>
+              <span class="admin-pin-value" id="admin-pin">1234</span>
             </div>
             <div class="admin-players">
               <span class="admin-players-label">Klanten Online</span>
@@ -135,7 +135,7 @@
             <span id="admin-question-progress">Verkoopdoel 1 / 20 afgerond</span>
           </div>
 
-          <button class="btn btn-primary" id="next-question-btn" style="padding: 20px; font-size: 1.5rem;">Ga naar de Volgende Sale →</button>
+          <button class="btn btn-primary" id="next-question-btn">Ga naar de Volgende Sale →</button>
         </div>
 
         <div class="admin-split-right">
