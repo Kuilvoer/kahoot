@@ -230,7 +230,8 @@ io.on('connection', (socket) => {
 
     // Profanity Filter
     const PROHIBITED_WORDS = [
-      'kanker', 'tyfus', 'tering', 'kut', 'hoer', 'slet', 'mongool', 'klootzak', 'bitch', 'fuck', 'shit', 'asshole', 'dick', 'cunt', 'pussy', 'whore', 'slut', 'fag', 'nigger', 'nigga', 'cancer', 'hitler', 'nazi', 'suck'
+      'kanker', 'tyfus', 'tering', 'kut', 'hoer', 'slet', 'mongool', 'klootzak', 'bitch', 'fuck', 'shit', 'asshole', 'dick', 'cunt', 'pussy', 'whore', 'slut', 'fag', 'nigger', 'nigga', 'cancer', 'hitler', 'nazi', 'suck',
+      'poep', 'sex', 'seks', 'porno', 'pik', 'lul', 'sneu', 'pedo'
     ];
     const lowerName = username.trim().toLowerCase();
     const isProfane = PROHIBITED_WORDS.some(word => lowerName.includes(word));
@@ -319,6 +320,16 @@ io.on('connection', (socket) => {
       io.to('game').emit('timerUpdate', { time: timeRemaining });
       handleTimeUp();
     }
+  });
+
+  // --- Admin resets the session ---
+  socket.on('adminResetSession', () => {
+    console.log('🔄 Admin triggered a hard reset. Wiping game data.');
+    clearInterval(timerInterval);
+    players = {};
+    currentQuestionIndex = -1;
+    timeRemaining = 30;
+    io.emit('forceReload');
   });
 
   // --- Admin sends next question ---

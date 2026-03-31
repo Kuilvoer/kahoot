@@ -277,4 +277,9 @@ if (isPlayerPage) {
   socket.on('gameOver', () => {
     showView(viewFinal);
   });
+
+  socket.on('forceReload', () => {
+    sessionStorage.removeItem('rody_username');
+    window.location.href = 'index.html';
+  });
 }

@@ -159,7 +159,15 @@
         <div class="divider"></div>
 
         <h3 class="section-title" style="text-align:center;">Eindstand Omzet (Top 5)</h3>
-        <ul class="leaderboard leaderboard--animated" id="final-leaderboard-admin"></ul>
+        <ul class="leaderboard leaderboard--animated" id="final-leaderboard-admin" style="margin-bottom: 2rem;"></ul>
+
+        <div class="final-controls" style="margin-top: 2rem; display: flex; flex-direction: column; align-items: center; gap: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1rem; color: var(--text-secondary); text-transform: uppercase;">Outro Muziek Volume</span>
+            <input type="range" id="outro-volume-slider" min="0" max="100" value="100" style="width: 150px;">
+          </div>
+          <button id="reset-session-btn" class="btn btn-primary" style="background: var(--accent-error); border: none; font-size: 1rem; padding: 15px;">🛑 Sluit Sessie & Reset Quiz</button>
+        </div>
 
         <p class="credit" style="margin-top: var(--space-lg);">door Rody Damman · vibecoded met AI</p>
       </div>
@@ -220,6 +228,18 @@
 
     const outroAudio = document.getElementById('outro-audio');
 
+    document.getElementById('outro-volume-slider').addEventListener('input', function(e) {
+      if (outroAudio) {
+        outroAudio.volume = e.target.value / 100;
+      }
+    });
+
+    document.getElementById('reset-session-btn').addEventListener('click', function() {
+      if(confirm('Weet je zeker dat je alle verbonden telefoons wilt kicken en de server scores leeg wilt vegen voor een nieuwe groep?')) {
+        socket.emit('adminResetSession');
+      }
+    });
+
     // ===== FORMATTING =====
     function formatCurrency(amount) {
       return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
@@ -275,6 +295,53 @@
       });
     }
 
+    // Animation logic for dramatic final TOP 5 presentation
+    function renderFinalLeaderboard(container, top5) {
+      container.innerHTML = ''; // Start clean
+      
+      const medals = ['🥇', '🥈', '🥉', '', ''];
+      const isLargeScreen = window.innerWidth >= 1024;
+      const itemHeight = isLargeScreen ? 120 : 75; 
+      const gap = isLargeScreen ? 20 : 12;
+
+      container.style.height = `${top5.length * (itemHeight + gap)}px`;
+
+      top5.forEach((p, i) => {
+        let el = document.createElement('li');
+        el.id = `final-item-${i}`;
+        el.className = 'leaderboard-item leaderboard-card';
+        // Start hidden way below
+        el.style.transform = `translateY(${container.offsetHeight + 300}px)`;
+        el.style.opacity = '0';
+        
+        el.innerHTML = `
+          <div class="leaderboard-card-rank">${medals[i] || (i + 1)}</div>
+          <div class="leaderboard-card-name">${p.username}</div>
+          <div class="leaderboard-card-score">${formatCurrency(p.score)}</div>
+        `;
+        container.appendChild(el);
+      });
+
+      // Sequential dramatic reveal
+      setTimeout(() => {
+        for (let i = 4; i >= 0; i--) {
+          const el = document.getElementById(`final-item-${i}`);
+          if (!el) continue;
+
+          let delay = 0;
+          if (i >= 3) delay = 500; // #5 and #4 quick reveal
+          else if (i === 2) delay = 3500; // #3 tension
+          else if (i === 1) delay = 7000; // #2 tension
+          else if (i === 0) delay = 11000; // #1 dramatic pause!
+
+          setTimeout(() => {
+            el.style.transform = `translateY(${i * (itemHeight + gap)}px)`;
+            el.style.opacity = '1';
+          }, delay);
+        }
+      }, 500);
+    }
+
     // ===== DOM ELEMENTS =====
     const viewLobby = document.getElementById('view-lobby');
     const viewQuestion = document.getElementById('view-question');
@@ -314,6 +381,12 @@
       viewLeaderboard.classList.add('hidden');
       viewFinal.classList.add('hidden');
       view.classList.remove('hidden');
+
+      // Hide Jukebox on the final screen so it doesn't clutter/interrupt Outro
+      const jukebox = document.querySelector('.jukebox-controls');
+      if (jukebox) {
+        jukebox.style.display = (view === viewFinal) ? 'none' : 'flex';
+      }
     }
 
     socket.emit('adminJoin');
@@ -397,11 +470,21 @@
         showView(viewFinal);
 
         const finalLeaderboard = document.getElementById('final-leaderboard-admin');
-        renderSleekLeaderboard(finalLeaderboard, top5);
+        renderFinalLeaderboard(finalLeaderboard, top5);
 
         if (top5.length > 0) {
+          // Hide winner text initially for dramatic delay
+          const finalWinnerEl = document.getElementById('final-winner');
+          finalWinnerEl.style.transition = 'opacity 1s';
+          finalWinnerEl.style.opacity = '0';
+          
           document.getElementById('winner-name').textContent = top5[0].username;
           document.getElementById('winner-score').textContent = formatCurrency(top5[0].score);
+
+          // Fade in exactly after #1 is revealed
+          setTimeout(() => {
+            finalWinnerEl.style.opacity = '1';
+          }, 11500); // Wait 11.5s
         }
       } else {
         showView(viewLeaderboard);
@@ -418,6 +501,10 @@
     startBtn.addEventListener('click', () => socket.emit('adminStartQuestion'));
     nextBtn.addEventListener('click', () => socket.emit('adminNextQuestion'));
     skipBtn.addEventListener('click', () => socket.emit('adminSkipQuestion'));
+
+    socket.on('forceReload', () => {
+      window.location.reload();
+    });
   </script>
 </body>
 </html>
