@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="De Grote E-Commerce Quiz — E-commerce Dashboard">
+  <title>E-Commerce Quiz — Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container container--admin">
+    <div class="logo">
+      <h1>🛒 De Grote<br>E-Commerce Quiz</h1>
+      <p>Sales Dashboard (Live Data)</p>
+    </div>
+
+    <!-- ===== LOBBY VIEW ===== -->
+    <div id="view-lobby">
+      <div class="card">
+        <div class="admin-header">
+          <div class="admin-qr" style="display:flex; flex-direction:column; align-items:flex-start;">
+            <span class="admin-pin-label" style="font-size:0.75rem;">Scan & Shop</span>
+            <img id="qr-code-img" src="" alt="QR Code" width="80" height="80" style="margin-top:5px; border-radius:8px; background:white; padding:4px;">
+          </div>
+          <div class="admin-pin">
+            <span class="admin-pin-label">Game PIN</span>
+            <span class="admin-pin-value" id="admin-pin">1234</span>
+          </div>
+          <div class="admin-players">
+            <span class="admin-players-label">Klanten Online</span>
+            <span class="admin-players-value" id="admin-player-count">0</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div id="admin-lobby">
+          <h2 class="section-title">Bezoekers in de Wachtkamer</h2>
+          <p class="status status-waiting" id="admin-waiting">Wachten op actieve shoppers...</p>
+          <ul class="player-list" id="admin-player-list"></ul>
+        </div>
+
+        <button class="btn btn-start" id="start-game-btn" disabled>
+          🛍️ Open de Webshop (Start)
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== QUESTION VIEW ===== -->
+    <div id="view-question" class="hidden">
+      <div class="card">
+        <div class="admin-question-header">
+          <span class="admin-question-counter" id="question-counter">Sale 1 / 20</span>
+        </div>
+
+        <!-- Flash Sale Timer Admin -->
+        <div class="flash-sale-container">
+          <div class="flash-sale-header">
+            <span class="flash-sale-title">⚡ FLASH SALE ENDS IN: <span id="admin-timer">30</span>s</span>
+          </div>
+          <div class="flash-sale-track">
+            <div class="flash-sale-bar" id="admin-timer-bar" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <p class="question-text" id="admin-question-text">Productbeschrijving wordt geladen...</p>
+
+        <div class="admin-options" id="admin-options">
+          <!-- Options will be injected here -->
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="admin-stats">
+          <div class="admin-stat">
+            <span class="admin-stat-label">Orders Geplaatst</span>
+            <span class="admin-stat-value" id="admin-answers-count">0 / 0</span>
+          </div>
+          <div class="admin-stat">
+            <span class="admin-stat-label">Klanten in Sessie</span>
+            <span class="admin-stat-value" id="admin-players-ingame">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LEADERBOARD VIEW ===== -->
+    <div id="view-leaderboard" class="hidden">
+      <div class="card card--wide">
+        <div class="admin-leaderboard-header">
+          <h2 class="section-title" style="text-align:center;">🔥 Top 5 Bestsellers (Revenue)</h2>
+          <div class="admin-correct-answer">
+            <span class="admin-correct-label">Ideale Strategie:</span>
+            <span class="admin-correct-value" id="admin-correct-answer">—</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <ul class="leaderboard leaderboard--animated" id="admin-leaderboard"></ul>
+
+        <div class="divider"></div>
+
+        <div class="admin-question-info">
+          <span id="admin-question-progress">Verkoopdoel 1 / 20 afgerond</span>
+        </div>
+
+        <button class="btn btn-primary" id="next-question-btn">Ga naar de Volgende Sale →</button>
+      </div>
+    </div>
+
+    <!-- ===== FINAL WINNER VIEW ===== -->
+    <div id="view-final" class="hidden">
+      <div class="card final-card card--wide">
+        <div class="final-trophy">🏆</div>
+        <h2 class="final-title">E-Commerce King/Queen!</h2>
+
+        <div class="final-winner" id="final-winner">
+          <p class="final-winner-name" id="winner-name">—</p>
+          <p class="final-winner-score" id="winner-score">€ 0,-</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3 class="section-title" style="text-align:center;">Eindstand Omzet (Top 5)</h3>
+        <ul class="leaderboard leaderboard--animated" id="final-leaderboard-admin"></ul>
+
+        <p class="credit" style="margin-top: var(--space-lg);">door Rody Damman · vibecoded met AI</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // ===== FORMATTING =====
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
+    }
+    
+    // Animation logic for smoothly sliding players
+    function renderSleekLeaderboard(container, top5) {
+      const medals = ['🥇', '🥈', '🥉', '', ''];
+      
+      // Calculate dynamic height
+      const itemHeight = 75; 
+      const gap = 12;
+      container.style.height = `${top5.length * (itemHeight + gap)}px`;
+
+      // Track items we rendered so we know what remains
+      const renderedUsernames = new Set();
+
+      top5.forEach((p, i) => {
+        renderedUsernames.add(p.username);
+        let el = document.getElementById(`board-item-${p.username}-${container.id}`);
+        
+        if (!el) {
+          el = document.createElement('li');
+          el.id = `board-item-${p.username}-${container.id}`;
+          el.className = 'leaderboard-item leaderboard-card';
+          
+          el.innerHTML = `
+            <div class="leaderboard-card-rank" id="rank-${p.username}-${container.id}">${medals[i] || (i + 1)}</div>
+            <div class="leaderboard-card-name">${p.username}</div>
+            <div class="leaderboard-card-score" id="score-${p.username}-${container.id}">${formatCurrency(p.score)}</div>
+          `;
+          
+          // Start lower and invisible
+          el.style.transform = `translateY(${i * (itemHeight + gap) + 40}px)`;
+          el.style.opacity = '0';
+          container.appendChild(el);
+          
+          // Force layout reflow
+          void el.offsetWidth;
+        } else {
+          // Update contents smoothly if they already exist
+          document.getElementById(`rank-${p.username}-${container.id}`).textContent = medals[i] || (i + 1);
+          document.getElementById(`score-${p.username}-${container.id}`).textContent = formatCurrency(p.score);
+        }
+        
+        // Apply final position smoothly
+        el.style.transform = `translateY(${i * (itemHeight + gap)}px)`;
+        el.style.opacity = '1';
+      });
+
+      // Remove players who dropped out of top 5
+      Array.from(container.children).forEach((child) => {
+        const username = child.id.split('-')[2]; // Assuming id format board-item-[username]-[container.id]
+        if (!renderedUsernames.has(username)) {
+          child.style.opacity = '0';
+          child.style.transform = `translateY(500px)`; // drop out
+          setTimeout(() => child.remove(), 500);
+        }
+      });
+    }
+
+    // ===== DOM ELEMENTS =====
+    const viewLobby = document.getElementById('view-lobby');
+    const viewQuestion = document.getElementById('view-question');
+    const viewLeaderboard = document.getElementById('view-leaderboard');
+    const viewFinal = document.getElementById('view-final');
+
+    const playerCountEl = document.getElementById('admin-player-count');
+    const playerListEl = document.getElementById('admin-player-list');
+    const waitingEl = document.getElementById('admin-waiting');
+    const startBtn = document.getElementById('start-game-btn');
+    const nextBtn = document.getElementById('next-question-btn');
+
+    const questionCounter = document.getElementById('question-counter');
+    const timerEl = document.getElementById('admin-timer');
+    const timerBarEl = document.getElementById('admin-timer-bar');
+    const questionText = document.getElementById('admin-question-text');
+    const optionsEl = document.getElementById('admin-options');
+    const answersCount = document.getElementById('admin-answers-count');
+    const playersIngame = document.getElementById('admin-players-ingame');
+
+    const adminCorrectAnswer = document.getElementById('admin-correct-answer');
+    const adminQuestionProgress = document.getElementById('admin-question-progress');
+
+    let totalPlayers = 0;
+
+    // Load QR Code dynamically for any environment
+    document.addEventListener('DOMContentLoaded', () => {
+      const qrImg = document.getElementById('qr-code-img');
+      if (qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin)}`;
+    });
+
+    // ===== VIEW SWITCHING =====
+    function showView(view) {
+      viewLobby.classList.add('hidden');
+      viewQuestion.classList.add('hidden');
+      viewLeaderboard.classList.add('hidden');
+      viewFinal.classList.add('hidden');
+      view.classList.remove('hidden');
+    }
+
+    // ===== CONNECT AS ADMIN =====
+    socket.emit('adminJoin');
+
+    // ===== EVENTS =====
+
+    socket.on('adminConnected', () => {
+      console.log('👑 Admin connected to server');
+    });
+
+    // Player list updates (lobby)
+    socket.on('playerList', ({ players, count }) => {
+      playerCountEl.textContent = count;
+      totalPlayers = count;
+      playersIngame.textContent = count;
+
+      startBtn.disabled = count === 0;
+
+      if (count === 0) {
+        waitingEl.classList.remove('hidden');
+        playerListEl.innerHTML = '';
+      } else {
+        waitingEl.classList.add('hidden');
+        playerListEl.innerHTML = players
+          .map((name, i) => `
+            <li class="player-list-item" style="animation-delay: ${i * 60}ms">
+              <span class="player-list-number">${i + 1}</span>
+              <span class="player-list-name">${name}</span>
+            </li>
+          `)
+          .join('');
+      }
+    });
+
+    // New question received
+    socket.on('newQuestion', ({ questionIndex, totalQuestions, questionText: qText, options }) => {
+      showView(viewQuestion);
+
+      questionCounter.textContent = `Sale ${questionIndex + 1} / ${totalQuestions}`;
+      questionText.textContent = qText;
+      answersCount.textContent = `0 / ${totalPlayers}`;
+
+      // Reset timer visuals
+      timerEl.textContent = '30';
+      timerBarEl.style.width = '100%';
+      document.querySelector('.flash-sale-container').classList.remove('flash-sale--urgent');
+
+      const colors = ['bol', 'amazon', 'shopify', 'purple'];
+      const icons = ['🛒', '🛍️', '📦', '🎁'];
+      
+      optionsEl.innerHTML = options
+        .map((opt, i) => `
+          <div class="admin-option admin-option--${colors[i]}">
+            <span class="admin-option-icon">${icons[i]}</span>
+            <span class="admin-option-text">${opt}</span>
+            <span class="admin-option-count" id="opt-count-${i}">0</span>
+          </div>
+        `)
+        .join('');
+    });
+
+    // Timer updates
+    socket.on('timerUpdate', ({ time }) => {
+      timerEl.textContent = time;
+      timerBarEl.style.width = `${(time / 30) * 100}%`;
+
+      if (time <= 5) {
+        document.querySelector('.flash-sale-container').classList.add('flash-sale--urgent');
+      } else {
+        document.querySelector('.flash-sale-container').classList.remove('flash-sale--urgent');
+      }
+    });
+
+    // Track answers coming in
+    socket.on('playerAnswered', ({ count, total }) => {
+      answersCount.textContent = `${count} / ${total}`;
+    });
+
+    // Show leaderboard after question
+    socket.on('showLeaderboard', ({ correctAnswer, top5, isLastQuestion, questionIndex, totalQuestions }) => {
+      if (isLastQuestion) {
+        // FINAL SCREEN
+        showView(viewFinal);
+
+        const finalLeaderboard = document.getElementById('final-leaderboard-admin');
+        renderSleekLeaderboard(finalLeaderboard, top5);
+
+        if (top5.length > 0) {
+          document.getElementById('winner-name').textContent = top5[0].username;
+          document.getElementById('winner-score').textContent = formatCurrency(top5[0].score);
+        }
+      } else {
+        // LEADERBOARD BETWEEN QUESTIONS
+        showView(viewLeaderboard);
+
+        adminCorrectAnswer.textContent = correctAnswer;
+        adminQuestionProgress.textContent = `Sale ${questionIndex + 1} / ${totalQuestions} afgerond`;
+
+        const adminLeaderboard = document.getElementById('admin-leaderboard');
+        renderSleekLeaderboard(adminLeaderboard, top5);
+      }
+    });
+
+    // ===== BUTTON HANDLERS =====
+
+    startBtn.addEventListener('click', () => {
+      socket.emit('adminStartQuestion');
+    });
+
+    nextBtn.addEventListener('click', () => {
+      socket.emit('adminNextQuestion');
+    });
+  </script>
+</body>
+</html>
