@@ -151,29 +151,34 @@
 
     <!-- ===== FINAL WINNER VIEW ===== -->
     <div id="view-final" class="hidden">
-      <div class="card final-card card--wide">
-        <div class="final-trophy">🏆</div>
-        <h2 class="final-title">E-Commerce King/Queen!</h2>
-
-        <div class="final-winner" id="final-winner">
-          <p class="final-winner-name" id="winner-name">—</p>
-          <p class="final-winner-score" id="winner-score">€ 0,-</p>
-        </div>
-
-        <div class="divider"></div>
-
-        <h3 class="section-title" style="text-align:center;">Eindstand Omzet (Top 5)</h3>
-        <ul class="leaderboard leaderboard--animated" id="final-leaderboard-admin" style="margin-bottom: 2rem;"></ul>
-
-        <div class="final-controls" style="margin-top: 2rem; display: flex; flex-direction: column; align-items: center; gap: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1rem; color: var(--text-secondary); text-transform: uppercase;">Outro Muziek Volume</span>
-            <input type="range" id="outro-volume-slider" min="0" max="100" value="100" style="width: 150px;">
+      <div class="card admin-split" style="min-height: 60vh;">
+        
+        <!-- Left Side: Trophy and Winner -->
+        <div class="admin-split-left" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+          <div class="final-trophy" style="font-size: 5rem; margin-bottom: 1rem;">🏆</div>
+          <h2 class="final-title" style="font-size: 2.5rem; margin-bottom: 1rem;">E-Commerce Kampioen!</h2>
+          
+          <div class="final-winner" id="final-winner" style="margin-top: 1rem; transition: opacity 1s; opacity: 0;">
+            <p class="final-winner-name" id="winner-name" style="font-size: 3.5rem; color: var(--accent-primary); font-weight: 900; margin: 0;">—</p>
+            <p class="final-winner-score" id="winner-score" style="font-size: 2.5rem; color: var(--accent-success); margin: 0;">€ 0,-</p>
           </div>
-          <button id="reset-session-btn" class="btn btn-primary" style="background: var(--accent-error); border: none; font-size: 1rem; padding: 15px;">🛑 Sluit Sessie & Reset Quiz</button>
+
+          <div class="final-controls" style="margin-top: 3rem; display: flex; flex-direction: column; align-items: stretch; gap: 1rem; width: 100%; max-width: 300px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+              <span style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase;">Outro Volume</span>
+              <input type="range" id="outro-volume-slider" min="0" max="100" value="100" style="width: 100%;">
+            </div>
+            <button id="reset-session-btn" class="btn btn-primary" style="background: var(--accent-error); border: none; font-size: 1rem; padding: 15px; width: 100%;">🛑 Sluit Sessie & Reset</button>
+          </div>
+          <p class="credit" style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">door Rody Damman · vibecoded met AI</p>
         </div>
 
-        <p class="credit" style="margin-top: var(--space-lg);">door Rody Damman · vibecoded met AI</p>
+        <!-- Right Side: Top 5 List -->
+        <div class="admin-split-right" style="display: flex; flex-direction: column;">
+          <h3 class="section-title" style="text-align: left; font-size: 1.8rem; margin-bottom: 1rem;">Eindstand (Top 5)</h3>
+          <ul class="leaderboard leaderboard--animated" id="final-leaderboard-admin" style="flex: 1; margin: 0;"></ul>
+        </div>
+        
       </div>
     </div>
   </div>
@@ -235,12 +240,6 @@
     document.getElementById('outro-volume-slider').addEventListener('input', function(e) {
       if (outroAudio) {
         outroAudio.volume = e.target.value / 100;
-      }
-    });
-
-    document.getElementById('reset-session-btn').addEventListener('click', function() {
-      if(confirm('Weet je zeker dat je alle verbonden telefoons wilt kicken en de server scores leeg wilt vegen voor een nieuwe groep?')) {
-        socket.emit('adminResetSession');
       }
     });
 
@@ -522,6 +521,17 @@
       forceEndBtn.addEventListener('click', () => {
         if(confirm('Weet je zeker dat je per direct naar de finale wilt gaan?')) {
           socket.emit('adminForceEndGame');
+        }
+      });
+    }
+
+    const resetBtn = document.getElementById('reset-session-btn');
+    if(resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        console.log("Reset knop geklikt");
+        if(confirm('Weet je zeker dat je alle telefoons wilt kicken en de score wilt wissen?')) {
+          console.log("Reset bevestigd");
+          socket.emit('adminResetSession');
         }
       });
     }
