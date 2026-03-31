@@ -393,14 +393,7 @@
           }
         });
 
-        // 2. Play Outro Music early (at 2s), so the drop perfectly aligns with #1
-        setTimeout(() => {
-          const outroAudio = document.getElementById('outro-audio');
-          if (outroAudio) {
-            outroAudio.currentTime = 0;
-            outroAudio.play().catch(e => console.warn("Browser auto-play prevented audio:", e));
-          }
-        }, 2000);
+
 
         // 3. Reveal Bronze #3
         setTimeout(() => {
@@ -473,11 +466,7 @@
       viewFinal.classList.add('hidden');
       view.classList.remove('hidden');
 
-      // Hide Jukebox on the final screen so it doesn't clutter/interrupt Outro
-      const jukebox = document.querySelector('.jukebox-controls');
-      if (jukebox) {
-        jukebox.style.display = (view === viewFinal) ? 'none' : 'flex';
-      }
+      // Removed hiding of Jukebox on final screen, so admin can turn it back on.
     }
 
     socket.emit('adminJoin');
@@ -554,6 +543,20 @@
     socket.on('showLeaderboard', ({ correctAnswer, top5, isLastQuestion, questionIndex, totalQuestions }) => {
 
       if (isLastQuestion) {
+        
+        // Auto-pause jukebox to let the epic outro play
+        if (typeof ytPlayer !== 'undefined' && ytPlayer && isMusicPlaying) {
+          ytPlayer.pauseVideo();
+          document.getElementById('toggle-music-btn').textContent = '🎵 Jukebox: UIT';
+          isMusicPlaying = false;
+        }
+
+        // Play Outro Music immediately at the start of the final screen
+        if (outroAudio) {
+          outroAudio.currentTime = 0;
+          outroAudio.play().catch(e => console.warn("Browser auto-play prevented audio:", e));
+        }
+
         showView(viewFinal);
 
         const finalLeaderboard = document.getElementById('final-leaderboard-admin');
