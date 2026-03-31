@@ -17,8 +17,7 @@
 
   <div class="container container--admin">
     <div class="logo">
-      <h1>🛒 De Grote<br>E-Commerce Quiz</h1>
-      <p>Sales Dashboard (Live Data)</p>
+      <h1>🛒 De Grote E-Commerce Quiz</h1>
 
       <!-- Jukebox Control -->
       <div class="jukebox-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 10px;">
@@ -34,17 +33,10 @@
 
     <!-- ===== LOBBY VIEW ===== -->
     <div id="view-lobby">
-      <div class="card card--wide" style="display: flex; flex-wrap: wrap; gap: var(--space-2xl); align-items: stretch; min-height: 60vh;">
+      <div class="card admin-split" style="min-height: 60vh;">
         
-        <!-- Left Side: Giant QR -->
-        <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg); padding: var(--space-xl);">
-          <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">Scan & Shop</h2>
-          <img id="qr-code-img" src="" alt="QR Code" style="width: 100%; max-width: 60vh; height: auto; max-height: 60vh; border-radius: 12px; background: white; padding: 15px;">
-          <p style="margin-top: 15px; color: var(--text-secondary); font-size: 1.1rem; text-align: center;">Of typ de game link in op je browser.</p>
-        </div>
-
-        <!-- Right Side: Game Info -->
-        <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column;">
+        <!-- Left Side: Game Info -->
+        <div class="admin-split-left" style="display: flex; flex-direction: column;">
           <div class="admin-header" style="flex-direction: column; align-items: flex-start; gap: var(--space-md);">
             <div class="admin-pin" style="margin-bottom: var(--space-md);">
               <span class="admin-pin-label">Game PIN</span>
@@ -68,6 +60,14 @@
             🛍️ Open de Webshop (Start)
           </button>
         </div>
+
+        <!-- Right Side: Giant QR -->
+        <div class="admin-split-right" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg); padding: var(--space-xl);">
+          <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">Scan & Shop</h2>
+          <img id="qr-code-img" src="" alt="QR Code" style="width: 100%; max-width: 50vh; height: auto; border-radius: 12px; background: white; padding: 15px;">
+          <p style="margin-top: 15px; color: var(--text-secondary); font-size: 1.1rem; text-align: center;">Of typ de game link in op je browser.</p>
+        </div>
+
       </div>
     </div>
 
