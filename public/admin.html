@@ -377,11 +377,12 @@
     });
 
     socket.on('showLeaderboard', ({ correctAnswer, top5, isLastQuestion, questionIndex, totalQuestions }) => {
-      // Play outro song (the requested feature on leaderboard show)
-      outroAudio.currentTime = 0;
-      outroAudio.play().catch(e => console.warn("Browser auto-play prevented audio:", e));
       
       if (isLastQuestion) {
+        // Play outro song ONLY at the very end
+        outroAudio.currentTime = 0;
+        outroAudio.play().catch(e => console.warn("Browser auto-play prevented audio:", e));
+
         showView(viewFinal);
 
         const finalLeaderboard = document.getElementById('final-leaderboard-admin');
