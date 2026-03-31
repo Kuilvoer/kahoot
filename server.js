@@ -340,11 +340,11 @@ io.on('connection', (socket) => {
     
     // Calculate final scores
     const leaderboard = Object.values(players).sort((a, b) => b.score - a.score);
-    const top5 = leaderboard.slice(0, 5);
+    const top7 = leaderboard.slice(0, 7);
 
     io.to('game').emit('showLeaderboard', {
       correctAnswer: 'Afgesloten door Quizmaster',
-      top5,
+      top5: top7, // rename logic maintained on client
       isLastQuestion: true,
       questionIndex: currentQuestionIndex,
       totalQuestions: questions.length,

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +10,12 @@
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
+
 <body>
 
   <!-- Hidden YT Player -->
   <div id="yt-player" style="position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px;"></div>
-  
+
   <audio id="outro-audio" src="audio/outro-song_oqu8zAg.mp3"></audio>
 
   <div class="container container--admin">
@@ -21,15 +23,18 @@
       <h1>🛒 De Grote E-Commerce Quiz</h1>
 
       <!-- Jukebox Control -->
-      <div class="jukebox-controls" style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 10px;">
-        <button id="toggle-music-btn" class="btn btn-primary" style="padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; margin:0;">
+      <div class="jukebox-controls"
+        style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 10px;">
+        <button id="toggle-music-btn" class="btn btn-primary"
+          style="padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; margin:0;">
           🎵 Jukebox: UIT
         </button>
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Volume</span>
           <input type="range" id="volume-slider" min="0" max="100" value="30" style="width: 120px; padding: 0;">
         </div>
-        <button id="force-end-btn" class="btn-primary" style="background: var(--accent-purple); padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; border: none; font-weight: bold; border-radius: 5px;">
+        <button id="force-end-btn" class="btn-primary"
+          style="background: var(--accent-purple); padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; border: none; font-weight: bold; border-radius: 5px;">
           ⏭️ Skip naar Finale
         </button>
       </div>
@@ -38,7 +43,7 @@
     <!-- ===== LOBBY VIEW ===== -->
     <div id="view-lobby">
       <div class="card admin-split" style="min-height: 60vh;">
-        
+
         <!-- Left Side: Game Info -->
         <div class="admin-split-left" style="display: flex; flex-direction: column;">
           <div class="admin-header" style="flex-direction: column; align-items: flex-start; gap: var(--space-md);">
@@ -61,15 +66,18 @@
           </div>
 
           <button class="btn btn-start" id="start-game-btn" disabled style="margin-top: var(--space-lg);">
-            🛍️ Open de Webshop (Start)
+            🛍️ Open de webshop (Start)
           </button>
         </div>
 
         <!-- Right Side: Giant QR -->
-        <div class="admin-split-right" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg); padding: var(--space-xl);">
+        <div class="admin-split-right"
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg); padding: var(--space-xl);">
           <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">Scan & Shop</h2>
-          <img id="qr-code-img" src="" alt="QR Code" style="width: 100%; max-width: 50vh; height: auto; border-radius: 12px; background: white; padding: 15px;">
-          <p style="margin-top: 15px; color: var(--text-secondary); font-size: 1.1rem; text-align: center;">Of typ de game link in op je browser.</p>
+          <img id="qr-code-img" src="" alt="QR Code"
+            style="width: 100%; max-width: 50vh; height: auto; border-radius: 12px; background: white; padding: 15px;">
+          <p style="margin-top: 15px; color: var(--text-secondary); font-size: 1.1rem; text-align: center;">Of typ de
+            game link in op je browser.</p>
         </div>
 
       </div>
@@ -78,13 +86,14 @@
     <!-- ===== QUESTION VIEW ===== -->
     <div id="view-question" class="hidden">
       <div class="card admin-split">
-        
+
         <!-- Left Side: Titles and Timer -->
         <div class="admin-split-left">
           <div class="admin-question-header" style="justify-content: flex-start; gap: 2rem;">
             <span class="admin-question-counter" id="question-counter">Sale 1 / 20</span>
-            <button id="skip-question-btn" class="btn-primary" style="padding: 5px 15px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; background: var(--accent-error);">
-              ⏭️ Skip Vraag
+            <button id="skip-question-btn" class="btn-primary"
+              style="padding: 5px 15px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; background: var(--accent-error);">
+              ⏭️ Skip vraag
             </button>
           </div>
 
@@ -110,11 +119,11 @@
 
           <div class="admin-stats">
             <div class="admin-stat">
-              <span class="admin-stat-label">Orders Geplaatst</span>
+              <span class="admin-stat-label">Orders geplaatst</span>
               <span class="admin-stat-value" id="admin-answers-count">0 / 0</span>
             </div>
             <div class="admin-stat">
-              <span class="admin-stat-label">Klanten in Sessie</span>
+              <span class="admin-stat-label">Klanten in sessie</span>
               <span class="admin-stat-value" id="admin-players-ingame">0</span>
             </div>
           </div>
@@ -126,10 +135,10 @@
     <!-- ===== LEADERBOARD VIEW ===== -->
     <div id="view-leaderboard" class="hidden">
       <div class="card admin-split">
-        
+
         <div class="admin-split-left">
           <h2 class="section-title">Resultaat & Bestsellers</h2>
-          
+
           <div class="admin-correct-answer" style="text-align: left; margin: 3rem 0;">
             <span class="admin-correct-label">Ideale Strategie:</span>
             <span class="admin-correct-value" id="admin-correct-answer">—</span>
@@ -139,46 +148,68 @@
             <span id="admin-question-progress">Verkoopdoel 1 / 20 afgerond</span>
           </div>
 
-          <button class="btn btn-primary" id="next-question-btn">Ga naar de Volgende Sale →</button>
+          <button class="btn btn-primary" id="next-question-btn">Ga naar de Volgende sale →</button>
         </div>
 
         <div class="admin-split-right">
           <ul class="leaderboard leaderboard--animated" id="admin-leaderboard"></ul>
         </div>
-        
+
       </div>
     </div>
 
     <!-- ===== FINAL WINNER VIEW ===== -->
     <div id="view-final" class="hidden">
       <div class="card admin-split" style="min-height: 60vh;">
-        
+
         <!-- Left Side: Trophy and Winner -->
-        <div class="admin-split-left" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-          <div class="final-trophy" style="font-size: 5rem; margin-bottom: 1rem;">🏆</div>
-          <h2 class="final-title" style="font-size: 2.5rem; margin-bottom: 1rem;">E-Commerce Kampioen!</h2>
+        <div class="admin-split-left" style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">
           
-          <div class="final-winner" id="final-winner" style="margin-top: 1rem; transition: opacity 1s; opacity: 0;">
-            <p class="final-winner-name" id="winner-name" style="font-size: 3.5rem; color: var(--accent-primary); font-weight: 900; margin: 0;">—</p>
-            <p class="final-winner-score" id="winner-score" style="font-size: 2.5rem; color: var(--accent-success); margin: 0;">€ 0,-</p>
+          <div class="podium-container" id="podium-container">
+            
+            <div class="podium-pillar podium-2" id="podium-2">
+              <div class="podium-name" id="podium-name-2">—</div>
+              <div class="podium-score" id="podium-score-2">€ 0,-</div>
+              <div class="podium-block">2</div>
+            </div>
+
+            <div class="podium-pillar podium-1" id="podium-1">
+              <div class="podium-name" id="podium-name-1">—</div>
+              <div class="podium-score" id="podium-score-1">€ 0,-</div>
+              <div class="podium-block">1</div>
+            </div>
+
+            <div class="podium-pillar podium-3" id="podium-3">
+              <div class="podium-name" id="podium-name-3">—</div>
+              <div class="podium-score" id="podium-score-3">€ 0,-</div>
+              <div class="podium-block">3</div>
+            </div>
+
           </div>
 
-          <div class="final-controls" style="margin-top: 3rem; display: flex; flex-direction: column; align-items: stretch; gap: 1rem; width: 100%; max-width: 300px;">
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
-              <span style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase;">Outro Volume</span>
+          <div class="final-controls"
+            style="margin-top: 3rem; display: flex; flex-direction: column; align-items: stretch; gap: 1rem; width: 100%; max-width: 300px;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+              <span style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase;">Outro
+                Volume</span>
               <input type="range" id="outro-volume-slider" min="0" max="100" value="100" style="width: 100%;">
             </div>
-            <button id="reset-session-btn" class="btn btn-primary" style="background: var(--accent-error); border: none; font-size: 1rem; padding: 15px; width: 100%;">🛑 Sluit Sessie & Reset</button>
+            <button id="reset-session-btn" class="btn btn-primary"
+              style="background: var(--accent-error); border: none; font-size: 1rem; padding: 15px; width: 100%;">🛑
+              Sluit Sessie & Reset</button>
           </div>
-          <p class="credit" style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">door Rody Damman · vibecoded met AI</p>
+          <p class="credit" style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">door Rody Damman
+            · vibecoded met AI</p>
         </div>
 
         <!-- Right Side: Top 5 List -->
         <div class="admin-split-right" style="display: flex; flex-direction: column;">
-          <h3 class="section-title" style="text-align: left; font-size: 1.8rem; margin-bottom: 1rem;">Eindstand (Top 5)</h3>
+          <h3 class="section-title" style="text-align: left; font-size: 1.8rem; margin-bottom: 1rem;">Behaalde Doelen (4 t/m 7)</h3>
+          </h3>
           <ul class="leaderboard leaderboard--animated" id="final-leaderboard-admin" style="flex: 1; margin: 0;"></ul>
         </div>
-        
+
       </div>
     </div>
   </div>
@@ -190,7 +221,7 @@
     // ===== YOUTUBE PLAYER API =====
     let ytPlayer;
     let isMusicPlaying = false;
-    
+
     function onYouTubeIframeAPIReady() {
       ytPlayer = new YT.Player('yt-player', {
         height: '0',
@@ -216,9 +247,9 @@
       event.target.setVolume(30); // sets initial volume
     }
 
-    document.getElementById('toggle-music-btn').addEventListener('click', function() {
-      if(!ytPlayer) return;
-      if(isMusicPlaying) {
+    document.getElementById('toggle-music-btn').addEventListener('click', function () {
+      if (!ytPlayer) return;
+      if (isMusicPlaying) {
         ytPlayer.pauseVideo();
         this.textContent = '🎵 Jukebox: UIT';
         isMusicPlaying = false;
@@ -229,7 +260,7 @@
       }
     });
 
-    document.getElementById('volume-slider').addEventListener('input', function(e) {
+    document.getElementById('volume-slider').addEventListener('input', function (e) {
       if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
         ytPlayer.setVolume(e.target.value);
       }
@@ -237,7 +268,7 @@
 
     const outroAudio = document.getElementById('outro-audio');
 
-    document.getElementById('outro-volume-slider').addEventListener('input', function(e) {
+    document.getElementById('outro-volume-slider').addEventListener('input', function (e) {
       if (outroAudio) {
         outroAudio.volume = e.target.value / 100;
       }
@@ -247,13 +278,13 @@
     function formatCurrency(amount) {
       return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
     }
-    
+
     // Animation logic for smoothly sliding players
     function renderSleekLeaderboard(container, top5) {
       const medals = ['🥇', '🥈', '🥉', '', ''];
       // Determine if large screen vs small screen to adjust heights
       const isLargeScreen = window.innerWidth >= 1024;
-      const itemHeight = isLargeScreen ? 120 : 75; 
+      const itemHeight = isLargeScreen ? 120 : 75;
       const gap = isLargeScreen ? 20 : 12;
 
       container.style.height = `${top5.length * (itemHeight + gap)}px`;
@@ -263,18 +294,18 @@
       top5.forEach((p, i) => {
         renderedUsernames.add(p.username);
         let el = document.getElementById(`board-item-${p.username}-${container.id}`);
-        
+
         if (!el) {
           el = document.createElement('li');
           el.id = `board-item-${p.username}-${container.id}`;
           el.className = 'leaderboard-item leaderboard-card';
-          
+
           el.innerHTML = `
             <div class="leaderboard-card-rank" id="rank-${p.username}-${container.id}">${medals[i] || (i + 1)}</div>
             <div class="leaderboard-card-name">${p.username}</div>
             <div class="leaderboard-card-score" id="score-${p.username}-${container.id}">${formatCurrency(p.score)}</div>
           `;
-          
+
           el.style.transform = `translateY(${i * (itemHeight + gap) + 40}px)`;
           el.style.opacity = '0';
           container.appendChild(el);
@@ -283,13 +314,13 @@
           document.getElementById(`rank-${p.username}-${container.id}`).textContent = medals[i] || (i + 1);
           document.getElementById(`score-${p.username}-${container.id}`).textContent = formatCurrency(p.score);
         }
-        
+
         el.style.transform = `translateY(${i * (itemHeight + gap)}px)`;
         el.style.opacity = '1';
       });
 
       Array.from(container.children).forEach((child) => {
-        const username = child.id.split('-')[2]; 
+        const username = child.id.split('-')[2];
         if (!renderedUsernames.has(username)) {
           child.style.opacity = '0';
           child.style.transform = `translateY(500px)`;
@@ -298,27 +329,49 @@
       });
     }
 
-    // Animation logic for dramatic final TOP 5 presentation
-    function renderFinalLeaderboard(container, top5) {
+    // Animation logic for dramatic final TOP 7 podium presentation
+    function renderFinalLeaderboard(container, top7) {
       container.innerHTML = ''; // Start clean
       
-      const medals = ['🥇', '🥈', '🥉', '', ''];
       const isLargeScreen = window.innerWidth >= 1024;
-      const itemHeight = isLargeScreen ? 120 : 75; 
-      const gap = isLargeScreen ? 20 : 12;
+      const itemHeight = isLargeScreen ? 100 : 75; 
+      const gap = isLargeScreen ? 15 : 12;
 
-      container.style.height = `${top5.length * (itemHeight + gap)}px`;
+      // Reset Podium (just in case)
+      for(let i=1; i<=3; i++) {
+        const pillar = document.getElementById(`podium-${i}`);
+        if(pillar) {
+          pillar.style.opacity = '0';
+          pillar.style.transform = 'translateY(100px)';
+        }
+      }
 
-      top5.forEach((p, i) => {
+      // Populate podium text
+      const top3 = top7.slice(0, 3);
+      for(let i=0; i<3; i++) {
+        const p = top3[i];
+        const nameEl = document.getElementById(`podium-name-${i+1}`);
+        const scoreEl = document.getElementById(`podium-score-${i+1}`);
+        if (nameEl && scoreEl) {
+          nameEl.textContent = p ? p.username : '—';
+          scoreEl.textContent = p ? formatCurrency(p.score) : '€ 0,-';
+        }
+      }
+
+      // Populate side list (4-7)
+      const runnersUp = top7.slice(3, 7);
+      container.style.height = `${runnersUp.length * (itemHeight + gap)}px`;
+
+      runnersUp.forEach((p, idx) => {
         let el = document.createElement('li');
-        el.id = `final-item-${i}`;
+        el.id = `final-item-${idx}`;
         el.className = 'leaderboard-item leaderboard-card';
         // Start hidden way below
         el.style.transform = `translateY(${container.offsetHeight + 300}px)`;
         el.style.opacity = '0';
         
         el.innerHTML = `
-          <div class="leaderboard-card-rank">${medals[i] || (i + 1)}</div>
+          <div class="leaderboard-card-rank">${idx + 4}</div>
           <div class="leaderboard-card-name">${p.username}</div>
           <div class="leaderboard-card-score">${formatCurrency(p.score)}</div>
         `;
@@ -327,33 +380,47 @@
 
       // Sequential dramatic reveal
       setTimeout(() => {
-        for (let i = 4; i >= 0; i--) {
-          const el = document.getElementById(`final-item-${i}`);
-          if (!el) continue;
+        
+        // 1. Reveal side list quickly
+        runnersUp.forEach((p, idx) => {
+          const el = document.getElementById(`final-item-${idx}`);
+          if (el) {
+            setTimeout(() => {
+              el.style.transform = `translateY(${idx * (itemHeight + gap)}px)`;
+              el.style.opacity = '1';
+            }, 500); // 0.5s all side items slide up
+          }
+        });
 
-          let delay = 0;
-          if (i >= 3) delay = 500; // #5 and #4 quick reveal
-          else if (i === 2) delay = 3500; // #3 tension
-          else if (i === 1) delay = 7000; // #2 tension
-          else if (i === 0) delay = 11000; // #1 dramatic pause!
+        // 2. Reveal Bronze #3
+        setTimeout(() => {
+          const p3 = document.getElementById('podium-3');
+          if(p3) { p3.style.transform = 'translateY(0)'; p3.style.opacity = '1'; }
+        }, 3500);
 
-          setTimeout(() => {
-            el.style.transform = `translateY(${i * (itemHeight + gap)}px)`;
-            el.style.opacity = '1';
+        // 3. Reveal Silver #2
+        setTimeout(() => {
+          const p2 = document.getElementById('podium-2');
+          if(p2) { p2.style.transform = 'translateY(0)'; p2.style.opacity = '1'; }
+        }, 7000);
 
-            // Fire confetti when #1 drops!
-            if (i === 0 && typeof confetti === 'function') {
-              confetti({
-                particleCount: 250,
-                spread: 120,
-                origin: { y: 0.6 },
-                startVelocity: 45,
-                colors: ['#FFD700', '#FFA500', '#FF4500', '#9400D3', '#00BFFF']
-              });
-            }
-          }, delay);
-        }
-      }, 500);
+        // 4. Reveal Gold #1 with Confetti!
+        setTimeout(() => {
+          const p1 = document.getElementById('podium-1');
+          if(p1) { p1.style.transform = 'translateY(0)'; p1.style.opacity = '1'; }
+
+          if (typeof confetti === 'function') {
+            confetti({
+              particleCount: 300,
+              spread: 140,
+              origin: { y: 0.6 },
+              startVelocity: 55,
+              colors: ['#FFD700', '#FFA500', '#FF4500', '#9400D3', '#00BFFF']
+            });
+          }
+        }, 11000);
+
+      }, 100);
     }
 
     // ===== DOM ELEMENTS =====
@@ -447,7 +514,7 @@
 
       const colors = ['bol', 'amazon', 'shopify', 'purple'];
       const icons = ['🛒', '🛍️', '📦', '🎁'];
-      
+
       optionsEl.innerHTML = options
         .map((opt, i) => `
           <div class="admin-option admin-option--${colors[i]}">
@@ -475,7 +542,7 @@
     });
 
     socket.on('showLeaderboard', ({ correctAnswer, top5, isLastQuestion, questionIndex, totalQuestions }) => {
-      
+
       if (isLastQuestion) {
         // Play outro song ONLY at the very end
         outroAudio.currentTime = 0;
@@ -484,22 +551,9 @@
         showView(viewFinal);
 
         const finalLeaderboard = document.getElementById('final-leaderboard-admin');
-        renderFinalLeaderboard(finalLeaderboard, top5);
+        renderFinalLeaderboard(finalLeaderboard, top5); // top5 variable from socket actually holds top7 because of serverside rename
 
-        if (top5.length > 0) {
-          // Hide winner text initially for dramatic delay
-          const finalWinnerEl = document.getElementById('final-winner');
-          finalWinnerEl.style.transition = 'opacity 1s';
-          finalWinnerEl.style.opacity = '0';
-          
-          document.getElementById('winner-name').textContent = top5[0].username;
-          document.getElementById('winner-score').textContent = formatCurrency(top5[0].score);
-
-          // Fade in exactly after #1 is revealed
-          setTimeout(() => {
-            finalWinnerEl.style.opacity = '1';
-          }, 11500); // Wait 11.5s
-        }
+        // (We no longer explicitly set winner-name here, it's handled inside renderFinalLeaderboard)
       } else {
         showView(viewLeaderboard);
 
@@ -517,19 +571,19 @@
     skipBtn.addEventListener('click', () => socket.emit('adminSkipQuestion'));
 
     const forceEndBtn = document.getElementById('force-end-btn');
-    if(forceEndBtn) {
+    if (forceEndBtn) {
       forceEndBtn.addEventListener('click', () => {
-        if(confirm('Weet je zeker dat je per direct naar de finale wilt gaan?')) {
+        if (confirm('Weet je zeker dat je per direct naar de finale wilt gaan?')) {
           socket.emit('adminForceEndGame');
         }
       });
     }
 
     const resetBtn = document.getElementById('reset-session-btn');
-    if(resetBtn) {
+    if (resetBtn) {
       resetBtn.addEventListener('click', () => {
         console.log("Reset knop geklikt");
-        if(confirm('Weet je zeker dat je alle telefoons wilt kicken en de score wilt wissen?')) {
+        if (confirm('Weet je zeker dat je alle telefoons wilt kicken en de score wilt wissen?')) {
           console.log("Reset bevestigd");
           socket.emit('adminResetSession');
         }
@@ -541,4 +595,5 @@
     });
   </script>
 </body>
+
 </html>
