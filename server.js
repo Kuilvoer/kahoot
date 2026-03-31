@@ -324,12 +324,21 @@ io.on('connection', (socket) => {
 
   // --- Admin resets the session ---
   socket.on('adminResetSession', () => {
-    console.log('🔄 Admin triggered a hard reset. Wiping game data.');
+    console.log('🔄 Admin triggered a reset. Wiping game data but keeping admin alive.');
     clearInterval(timerInterval);
+    
+    // Kick all players to the home screen context, but softly reset admins
+    io.sockets.sockets.forEach((s) => {
+      if (players[s.id]) {
+        s.emit('forceReload'); // player reload
+      } else {
+        s.emit('adminSoftReset'); // admin soft UI reset
+      }
+    });
+
     players = {};
     currentQuestionIndex = -1;
     timeRemaining = 30;
-    io.emit('forceReload');
   });
 
   // --- Admin forces game to end early ---

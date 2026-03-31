@@ -595,6 +595,22 @@
       });
     }
 
+    socket.on('adminSoftReset', () => {
+      console.log('Soft Reset Triggered: Zachte reset naar het dashboard');
+      showView(viewLobby);
+      playerCountEl.textContent = '0';
+      playerListEl.innerHTML = '';
+      waitingEl.classList.remove('hidden');
+      startBtn.disabled = true;
+      if (outroAudio) {
+        outroAudio.pause();
+        outroAudio.currentTime = 0;
+      }
+      if (typeof confetti === 'function') {
+        confetti.reset();
+      }
+    });
+
     socket.on('forceReload', () => {
       window.location.reload();
     });
