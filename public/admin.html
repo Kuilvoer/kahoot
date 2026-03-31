@@ -7,6 +7,7 @@
   <title>E-Commerce Quiz — Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
@@ -20,7 +21,7 @@
       <h1>🛒 De Grote E-Commerce Quiz</h1>
 
       <!-- Jukebox Control -->
-      <div class="jukebox-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 10px;">
+      <div class="jukebox-controls" style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 10px;">
         <button id="toggle-music-btn" class="btn btn-primary" style="padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; margin:0;">
           🎵 Jukebox: UIT
         </button>
@@ -28,6 +29,9 @@
           <span style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Volume</span>
           <input type="range" id="volume-slider" min="0" max="100" value="30" style="width: 120px; padding: 0;">
         </div>
+        <button id="force-end-btn" class="btn-primary" style="background: var(--accent-purple); padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; border: none; font-weight: bold; border-radius: 5px;">
+          ⏭️ Skip naar Finale
+        </button>
       </div>
     </div>
 
@@ -337,6 +341,17 @@
           setTimeout(() => {
             el.style.transform = `translateY(${i * (itemHeight + gap)}px)`;
             el.style.opacity = '1';
+
+            // Fire confetti when #1 drops!
+            if (i === 0 && typeof confetti === 'function') {
+              confetti({
+                particleCount: 250,
+                spread: 120,
+                origin: { y: 0.6 },
+                startVelocity: 45,
+                colors: ['#FFD700', '#FFA500', '#FF4500', '#9400D3', '#00BFFF']
+              });
+            }
           }, delay);
         }
       }, 500);
@@ -501,6 +516,15 @@
     startBtn.addEventListener('click', () => socket.emit('adminStartQuestion'));
     nextBtn.addEventListener('click', () => socket.emit('adminNextQuestion'));
     skipBtn.addEventListener('click', () => socket.emit('adminSkipQuestion'));
+
+    const forceEndBtn = document.getElementById('force-end-btn');
+    if(forceEndBtn) {
+      forceEndBtn.addEventListener('click', () => {
+        if(confirm('Weet je zeker dat je per direct naar de finale wilt gaan?')) {
+          socket.emit('adminForceEndGame');
+        }
+      });
+    }
 
     socket.on('forceReload', () => {
       window.location.reload();

@@ -332,6 +332,25 @@ io.on('connection', (socket) => {
     io.emit('forceReload');
   });
 
+  // --- Admin forces game to end early ---
+  socket.on('adminForceEndGame', () => {
+    console.log('⏭️ Admin forced game to end early -> skipping to final leaderboard');
+    clearInterval(timerInterval);
+    currentQuestionIndex = questions.length; // Artificially mark as done
+    
+    // Calculate final scores
+    const leaderboard = Object.values(players).sort((a, b) => b.score - a.score);
+    const top5 = leaderboard.slice(0, 5);
+
+    io.to('game').emit('showLeaderboard', {
+      correctAnswer: 'Afgesloten door Quizmaster',
+      top5,
+      isLastQuestion: true,
+      questionIndex: currentQuestionIndex,
+      totalQuestions: questions.length,
+    });
+  });
+
   // --- Admin sends next question ---
   socket.on('adminNextQuestion', () => {
     currentQuestionIndex++;
