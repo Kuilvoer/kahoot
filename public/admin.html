@@ -35,7 +35,7 @@
         </div>
         <button id="force-end-btn" class="btn-primary"
           style="background: var(--accent-purple); padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; border: none; font-weight: bold; border-radius: 5px;">
-          ⏭️ Skip naar Finale
+          ⏭️ Skip naar finale
         </button>
       </div>
     </div>
@@ -52,7 +52,7 @@
               <span class="admin-pin-value" id="admin-pin">1234</span>
             </div>
             <div class="admin-players">
-              <span class="admin-players-label">Klanten Online</span>
+              <span class="admin-players-label">Klanten online</span>
               <span class="admin-players-value" id="admin-player-count">0</span>
             </div>
           </div>
@@ -60,20 +60,20 @@
           <div class="divider"></div>
 
           <div id="admin-lobby" style="flex: 1; overflow-y: auto; padding-right: 10px;">
-            <h2 class="section-title">Bezoekers in de Wachtkamer</h2>
+            <h2 class="section-title">Bezoekers in de wachtkamer</h2>
             <p class="status status-waiting" id="admin-waiting">Wachten op actieve shoppers...</p>
             <ul class="player-list" id="admin-player-list"></ul>
           </div>
 
           <button class="btn btn-start" id="start-game-btn" disabled style="margin-top: var(--space-lg);">
-            🛍️ Open de webshop (Start)
+            🛍️ Open de webshop (start)
           </button>
         </div>
 
         <!-- Right Side: Giant QR -->
         <div class="admin-split-right"
           style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg); padding: var(--space-xl);">
-          <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">Scan & Shop</h2>
+          <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">Scan & shop</h2>
           <img id="qr-code-img" src="" alt="QR Code"
             style="width: 100%; max-width: 50vh; height: auto; border-radius: 12px; background: white; padding: 15px;">
           <p style="margin-top: 15px; color: var(--text-secondary); font-size: 1.1rem; text-align: center;">Of typ de
@@ -101,7 +101,7 @@
 
           <div class="flash-sale-container" style="margin-top: auto; width: 100%;">
             <div class="flash-sale-header">
-              <span class="flash-sale-title">⚡ FLASH SALE ENDS IN: <span id="admin-timer">30</span>s</span>
+              <span class="flash-sale-title">⚡ Flash sale ends in: <span id="admin-timer">30</span>s</span>
             </div>
             <div class="flash-sale-track">
               <div class="flash-sale-bar" id="admin-timer-bar" style="width: 100%;"></div>
@@ -137,10 +137,10 @@
       <div class="card admin-split">
 
         <div class="admin-split-left">
-          <h2 class="section-title">Resultaat & Bestsellers</h2>
+          <h2 class="section-title">Resultaat & bestsellers</h2>
 
           <div class="admin-correct-answer" style="text-align: left; margin: 3rem 0;">
-            <span class="admin-correct-label">Ideale Strategie:</span>
+            <span class="admin-correct-label">Ideale strategie:</span>
             <span class="admin-correct-value" id="admin-correct-answer">—</span>
           </div>
 
@@ -148,7 +148,7 @@
             <span id="admin-question-progress">Verkoopdoel 1 / 20 afgerond</span>
           </div>
 
-          <button class="btn btn-primary" id="next-question-btn">Ga naar de Volgende sale →</button>
+          <button class="btn btn-primary" id="next-question-btn">Ga naar de volgende sale →</button>
         </div>
 
         <div class="admin-split-right">
@@ -165,6 +165,9 @@
         <!-- Left Side: Trophy and Winner -->
         <div class="admin-split-left" style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">
           
+          <div class="final-trophy" style="font-size: 5rem; margin-bottom: 1rem;">🏆</div>
+          <h2 class="final-title" style="font-size: 2.5rem; margin-bottom: 1rem;">E-commerce kampioen!</h2>
+
           <div class="podium-container" id="podium-container">
             
             <div class="podium-pillar podium-2" id="podium-2">
@@ -191,13 +194,12 @@
             style="margin-top: 3rem; display: flex; flex-direction: column; align-items: stretch; gap: 1rem; width: 100%; max-width: 300px;">
             <div
               style="display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
-              <span style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase;">Outro
-                Volume</span>
+              <span style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase;">Outro volume</span>
               <input type="range" id="outro-volume-slider" min="0" max="100" value="100" style="width: 100%;">
             </div>
             <button id="reset-session-btn" class="btn btn-primary"
               style="background: var(--accent-error); border: none; font-size: 1rem; padding: 15px; width: 100%;">🛑
-              Sluit Sessie & Reset</button>
+              Sluit sessie & reset</button>
           </div>
           <p class="credit" style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">door Rody Damman
             · vibecoded met AI</p>
@@ -205,8 +207,7 @@
 
         <!-- Right Side: Top 5 List -->
         <div class="admin-split-right" style="display: flex; flex-direction: column;">
-          <h3 class="section-title" style="text-align: left; font-size: 1.8rem; margin-bottom: 1rem;">Behaalde Doelen (4 t/m 7)</h3>
-          </h3>
+          <h3 class="section-title" style="text-align: left; font-size: 1.8rem; margin-bottom: 1rem;">Behaalde doelen (4 t/m 7)</h3>
           <ul class="leaderboard leaderboard--animated" id="final-leaderboard-admin" style="flex: 1; margin: 0;"></ul>
         </div>
 
