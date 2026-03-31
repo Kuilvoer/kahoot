@@ -51,7 +51,17 @@ if (isIndexPage) {
 
   socket.on('joinSuccess', ({ username }) => {
     sessionStorage.setItem('rody_username', username);
-    window.location.href = 'player.html';
+    
+    // Play Join Audio
+    try {
+      const audioJoin = new Audio('audio/ron-jans-keukenrol.mp3');
+      audioJoin.play().catch(e => console.warn("Browser blocked audio: ", e));
+    } catch(e) {}
+
+    // Delay redirect slightly so audio can play
+    setTimeout(() => {
+      window.location.href = 'player.html';
+    }, 1500);
   });
 
   socket.on('joinError', ({ message }) => {
@@ -97,6 +107,10 @@ if (isPlayerPage) {
 
   let selectedAnswer = null;
   let currentOptions = [];
+
+  // ===== AUDIO ELEMENTS =====
+  const audioCorrect = new Audio('audio/ding-sound-effect_1_CVUaI0C.mp3');
+  const audioWrong = new Audio('audio/fahhh_KcgAXfs.mp3');
 
   // ===== VIEW SWITCHING =====
   function showView(view) {
@@ -229,16 +243,22 @@ if (isPlayerPage) {
       const scoreLabel = document.querySelector('.result-score-label');
 
       if (didNotAnswer) {
+        audioWrong.currentTime = 0;
+        audioWrong.play().catch(e => console.warn(e));
         feedbackIcon.innerHTML = '⏱️';
         feedbackText.textContent = 'Transaction Cancelled (Timeout)';
         playerFeedback.className = 'feedback feedback--incorrect';
         if (scoreLabel) scoreLabel.textContent = 'Huidige balans';
       } else if (isCorrect) {
+        audioCorrect.currentTime = 0;
+        audioCorrect.play().catch(e => console.warn(e));
         feedbackIcon.innerHTML = '✅';
         feedbackText.textContent = 'Order Confirmed!';
         playerFeedback.className = 'feedback feedback--correct';
         if (scoreLabel) scoreLabel.textContent = 'Nieuwe Profit ⭐';
       } else {
+        audioWrong.currentTime = 0;
+        audioWrong.play().catch(e => console.warn(e));
         feedbackIcon.innerHTML = '<div class="out-of-stock-badge">OUT OF STOCK</div>';
         feedbackText.textContent = 'Transaction Declined.';
         playerFeedback.className = 'feedback feedback--incorrect';

@@ -300,6 +300,16 @@ io.on('connection', (socket) => {
     broadcastCurrentQuestion();
   });
 
+  // --- Admin skips current question ---
+  socket.on('adminSkipQuestion', () => {
+    if (timerInterval) {
+      console.log('⏭️ Admin skipped the question');
+      timeRemaining = 0;
+      io.to('game').emit('timerUpdate', { time: timeRemaining });
+      handleTimeUp();
+    }
+  });
+
   // --- Admin sends next question ---
   socket.on('adminNextQuestion', () => {
     currentQuestionIndex++;
