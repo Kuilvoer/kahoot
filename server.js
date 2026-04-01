@@ -173,6 +173,7 @@ function handleTimeUp() {
 
   // Calculate top 5 leaderboard
   const top5 = Object.values(players)
+    .filter((p) => p.username && p.username.trim() !== '' && p.activeSocket)
     .map((p) => ({ username: p.username, score: p.score }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
@@ -384,7 +385,9 @@ io.on('connection', (socket) => {
     currentQuestionIndex = questions.length; // Artificially mark as done
     
     // Calculate final scores
-    const leaderboard = Object.values(players).sort((a, b) => b.score - a.score);
+    const leaderboard = Object.values(players)
+      .filter((p) => p.username && p.username.trim() !== '' && p.activeSocket)
+      .sort((a, b) => b.score - a.score);
     const top7 = leaderboard.slice(0, 7);
 
     io.to('game').emit('showLeaderboard', {
