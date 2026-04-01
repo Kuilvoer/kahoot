@@ -13,6 +13,14 @@ function formatCurrency(amount) {
   return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
 }
 
+// ==== PERSISTENT PLAYER ID ====
+// If no playerId exists in localStorage, generate a simple unique random string.
+let playerId = localStorage.getItem('rody_player_id');
+if (!playerId) {
+  playerId = 'player_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+  localStorage.setItem('rody_player_id', playerId);
+}
+
 // Helper: Animate count up (Cash Register effect)
 function animateValue(obj, start, end, duration) {
   if (!obj) return;
@@ -46,22 +54,26 @@ if (isIndexPage) {
     joinBtn.disabled = true;
     joinBtn.textContent = 'Verifiëren...';
 
-    socket.emit('joinRoom', { pin, username });
+    socket.emit('joinRoom', { pin, username, playerId });
   });
 
-  socket.on('joinSuccess', ({ username }) => {
+
+
+  socket.on('joinSuccess', ({ username, isReconnect }) => {
     sessionStorage.setItem('rody_username', username);
     
-    // Play Join Audio
-    try {
-      const audioJoin = new Audio('audio/ron-jans-keukenrol.mp3');
-      audioJoin.play().catch(e => console.warn("Browser blocked audio: ", e));
-    } catch(e) {}
+    if (!isReconnect) {
+      // Play Join Audio for new joins
+      try {
+        const audioJoin = new Audio('audio/ron-jans-keukenrol.mp3');
+        audioJoin.play().catch(e => console.warn("Browser blocked audio: ", e));
+      } catch(e) {}
+    }
 
     // Delay redirect slightly so audio can play
     setTimeout(() => {
       window.location.href = 'player.html';
-    }, 1500);
+    }, isReconnect ? 0 : 1500); // 0 delay if it's just a reconnect
   });
 
   socket.on('joinError', ({ message }) => {
@@ -140,7 +152,15 @@ if (isPlayerPage) {
   if (playerNameEl) playerNameEl.textContent = username;
 
   // ===== RE-JOIN THE ROOM =====
-  socket.emit('joinRoom', { pin: '1234', username });
+  // If connection drops and re-establishes, socket.io automatically triggers this
+  socket.on('connect', () => {
+    socket.emit('joinRoom', { pin: '1234', username, playerId });
+    socket.emit('requestState'); // Asks backend: "What screen should I be showing right now?"
+  });
+
+  socket.on('disconnect', () => {
+    console.warn("Verbinding verbroken. Automatisch proberen te herstellen...");
+  });
 
   // ===== SOCKET EVENTS =====
 
@@ -280,6 +300,7 @@ if (isPlayerPage) {
 
   socket.on('forceReload', () => {
     sessionStorage.removeItem('rody_username');
+    localStorage.removeItem('rody_player_id'); // Optional: explicitly purge ID if kicked
     window.location.href = 'index.html';
   });
 }

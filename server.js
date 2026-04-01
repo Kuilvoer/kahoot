@@ -116,7 +116,8 @@ const questions = [
 ];
 
 // ===== GAME STATE =====
-const players = {}; // { socketId: { username, score, currentAnswer } }
+const players = {}; // { playerId: { username, score, currentAnswer, activeSocket: socket.id } }
+const socketToPlayerMap = {}; // { socketId: playerId }
 let currentQuestionIndex = -1; // -1 = game not started
 let timerInterval = null;
 let timeRemaining = 0;
@@ -128,7 +129,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ===== HELPER FUNCTIONS =====
 function getPlayerCount() {
-  return Object.keys(players).length;
+  // Count only actively connected players for the dashboard
+  return Object.values(players).filter(p => p.activeSocket !== null).length;
 }
 
 function startTimer() {
@@ -216,9 +218,9 @@ function broadcastCurrentQuestion() {
 io.on('connection', (socket) => {
   console.log(`[+] New connection: ${socket.id}`);
 
-  // --- Player joins with PIN + username ---
-  socket.on('joinRoom', ({ pin, username }) => {
-    if (!pin || !username) {
+  // --- Player joins with PIN + username + playerId ---
+  socket.on('joinRoom', ({ pin, username, playerId }) => {
+    if (!pin || !username || !playerId) {
       socket.emit('joinError', { message: 'Vul zowel PIN als naam in.' });
       return;
     }
@@ -240,27 +242,38 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Check for duplicate username (skip if same socket re-joining)
-    const nameTaken = Object.entries(players).some(
-      ([id, p]) => id !== socket.id && p.username.toLowerCase() === username.trim().toLowerCase()
-    );
-    if (nameTaken) {
-      socket.emit('joinError', { message: 'Deze naam is al bezet. Kies een andere.' });
-      return;
-    }
-
-    // Join the game room
     socket.join('game');
-    players[socket.id] = {
-      username: username.trim(),
-      score: 0,
-      currentAnswer: null,
-    };
 
-    console.log(`🎮 ${username} joined the game (${getPlayerCount()} players)`);
+    // RECONNECT LOGIC: Check if this player already exists by UUID
+    if (players[playerId]) {
+      // Re-map the new physical socket to the existing logical player
+      socketToPlayerMap[socket.id] = playerId;
+      players[playerId].activeSocket = socket.id;
+      players[playerId].username = username.trim(); // Always update to latest display name
+      console.log(`🔌 ${username} reconnected (Score: ${players[playerId].score})`);
+      socket.emit('joinSuccess', { username: username.trim(), isReconnect: true });
+    } else {
+      // Check for duplicate username for NEW players
+      const nameTaken = Object.values(players).some(
+        (p) => p.username.toLowerCase() === username.trim().toLowerCase()
+      );
+      if (nameTaken) {
+        socket.emit('joinError', { message: 'Deze naam is al bezet. Kies een andere.' });
+        return;
+      }
 
-    // Confirm to the player
-    socket.emit('joinSuccess', { username: username.trim() });
+      // Create new logical player
+      socketToPlayerMap[socket.id] = playerId;
+      players[playerId] = {
+        username: username.trim(),
+        score: 0,
+        currentAnswer: null,
+        activeSocket: socket.id
+      };
+
+      console.log(`🎮 ${username} joined the game (${getPlayerCount()} players)`);
+      socket.emit('joinSuccess', { username: username.trim(), isReconnect: false });
+    }
 
     // Notify everyone about the updated player count
     io.to('game').emit('playerCount', { count: getPlayerCount() });
@@ -271,7 +284,11 @@ io.on('connection', (socket) => {
       count: getPlayerCount(),
     });
 
-    // If game already started, send current state to the late joiner
+  });
+
+  // --- State Synchronization (Player asks: Where are we?) ---
+  socket.on('requestState', () => {
+    // If game already started, send current state to the reconnecting player
     if (currentQuestionIndex >= 0 && currentQuestionIndex < questions.length) {
       const q = questions[currentQuestionIndex];
       socket.emit('newQuestion', {
@@ -280,7 +297,22 @@ io.on('connection', (socket) => {
         questionText: q.questionText,
         options: q.options,
       });
-      socket.emit('timerUpdate', { time: timeRemaining });
+
+      // If timer is still running, sync it
+      if (timeRemaining > 0) {
+        socket.emit('timerUpdate', { time: timeRemaining });
+      }
+
+      // Check if player had already submitted an answer for this active round BEFORE the drop
+      const playerId = socketToPlayerMap[socket.id];
+      if (playerId && players[playerId]?.currentAnswer !== null) {
+         // They already answered
+         socket.emit('answerReceived', { pointsEarned: 0 }); // Just triggering the view
+      }
+
+    } else if (currentQuestionIndex >= questions.length) {
+      // Game completely over
+      socket.emit('gameOver');
     }
   });
 
@@ -329,14 +361,18 @@ io.on('connection', (socket) => {
     
     // Kick all players to the home screen context, but softly reset admins
     io.sockets.sockets.forEach((s) => {
-      if (players[s.id]) {
+      const mappedPlayerId = socketToPlayerMap[s.id];
+      if (mappedPlayerId && players[mappedPlayerId]) {
         s.emit('forceReload'); // player reload
       } else {
         s.emit('adminSoftReset'); // admin soft UI reset
       }
     });
 
-    players = {};
+    // Clear maps entirely
+    for (const key in players) delete players[key];
+    for (const key in socketToPlayerMap) delete socketToPlayerMap[key];
+    
     currentQuestionIndex = -1;
     timeRemaining = 30;
   });
@@ -375,7 +411,9 @@ io.on('connection', (socket) => {
 
   // --- Player submits an answer ---
   socket.on('submitAnswer', ({ answerIndex }) => {
-    const player = players[socket.id];
+    const playerId = socketToPlayerMap[socket.id];
+    if (!playerId) return;
+    const player = players[playerId];
     if (!player) return;
 
     // Already answered this question
@@ -387,10 +425,19 @@ io.on('connection', (socket) => {
     const q = questions[currentQuestionIndex];
     const isCorrect = answerIndex === q.correctIndex;
 
+    const elapsed = (Date.now() - questionStartTime) / 1000; // seconds elapsed
+    
+    // GRACE PERIOD: Reject answers completely if they are 1.5s past the strict Timer. 
+    // This accounts for internet drops/latency in an 80-user room.
+    if (elapsed > (TIMER_DURATION + 1.5)) {
+      console.log(`⚠️ Network Lag: ${player.username} answered too late (${elapsed}s)`);
+      return; 
+    }
+
     // Calculate score based on speed (max 1000, linear decrease over TIMER_DURATION)
     let pointsEarned = 0;
     if (isCorrect) {
-      const elapsed = (Date.now() - questionStartTime) / 1000; // seconds elapsed
+      // Math.max guarantees 0 points if they answered after TIMER_DURATION but inside Grace Period
       const fraction = Math.max(0, 1 - elapsed / TIMER_DURATION);
       pointsEarned = Math.round(fraction * 1000);
     }
@@ -421,28 +468,27 @@ io.on('connection', (socket) => {
 
   // --- Disconnect ---
   socket.on('disconnect', () => {
-    if (players[socket.id]) {
-      const wasAnswered = players[socket.id].currentAnswer !== null;
-      console.log(`[-] ${players[socket.id].username} disconnected`);
-      delete players[socket.id];
+    const playerId = socketToPlayerMap[socket.id];
+    
+    if (playerId && players[playerId]) {
+      console.log(`[-] ${players[playerId].username} disconnected physically, but session retained.`);
+      
+      // We do NOT delete the player from the 'players' dictionary anymore!
+      // This is the entire point of the V2 architecture. They stay alive so they can reconnect.
 
-      // Update counts
-      io.to('game').emit('playerCount', { count: getPlayerCount() });
+      players[playerId].activeSocket = null;
+      // We DO delete the physical mapping so memory doesn't leak infinitely for old socket IDs
+      delete socketToPlayerMap[socket.id];
+
+      // Update counts based on active connections
+      const activeCount = Object.values(players).filter(p => p.activeSocket !== null).length;
+      io.to('game').emit('playerCount', { count: activeCount });
       io.emit('playerList', {
-        players: Object.values(players).map((p) => p.username),
-        count: getPlayerCount(),
+        players: Object.values(players).filter(p => p.activeSocket !== null).map((p) => p.username),
+        count: activeCount,
       });
 
-      // Check if all remaining players have now answered
-      if (
-        !wasAnswered &&
-        timerInterval &&
-        getPlayerCount() > 0 &&
-        answersReceived >= getPlayerCount()
-      ) {
-        console.log('⚡ All remaining players answered — ending round early');
-        handleTimeUp();
-      }
+      // Note: We avoid deleting them from answered count so the round can still gracefully conclude
     } else {
       console.log(`[-] Disconnected: ${socket.id}`);
     }
